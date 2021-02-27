@@ -15,8 +15,16 @@
  */
 package com.example.androiddevchallenge
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.androiddevchallenge.ui.DetailsTitleTestTag
+import com.example.androiddevchallenge.ui.ListItemTestTag
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,5 +42,13 @@ class ExampleInstrumentedTest {
     @Test
     fun sampleTest() {
         // Add instrumented tests here
+        composeTestRule.run {
+            setContent {
+                MyApp()
+            }
+            onNodeWithText(activity.getString(R.string.puppy_list_title)).assertIsDisplayed()
+            onAllNodesWithTag(ListItemTestTag).onFirst().assertIsDisplayed().performClick()
+            onNodeWithTag(DetailsTitleTestTag).assertIsDisplayed()
+        }
     }
 }

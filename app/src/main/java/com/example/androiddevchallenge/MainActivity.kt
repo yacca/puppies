@@ -20,9 +20,18 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
+import androidx.navigation.compose.navigate
+import androidx.navigation.compose.rememberNavController
+import com.example.androiddevchallenge.ui.PuppyDetailsScreen
+import com.example.androiddevchallenge.ui.PuppyListScreen
 import com.example.androiddevchallenge.ui.theme.MyTheme
 
 class MainActivity : AppCompatActivity() {
@@ -40,9 +49,43 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun MyApp() {
     Surface(color = MaterialTheme.colors.background) {
-        Text(text = "Ready... Set... GO!")
+        val navController = rememberNavController()
+        val actions = remember(navController) { MainActions(navController) }
+        NavHost(
+            navController = navController,
+            startDestination = NavDest.SCREEN_LIST
+        ) {
+            composable(NavDest.SCREEN_LIST) {
+                PuppyListScreen(actions.selectPuppy)
+            }
+            composable(
+                "${NavDest.SCREEN_DETAILS}/{$ARG_PUPPY_ID}",
+                arguments = listOf(navArgument(ARG_PUPPY_ID) { type = NavType.LongType })
+            ) {
+                PuppyDetailsScreen(
+                    id = it.arguments?.getLong(ARG_PUPPY_ID) ?: 0,
+                    upPress = actions.upPress
+                )
+            }
+        }
     }
 }
+
+class MainActions(navController: NavHostController) {
+    val selectPuppy: (Long) -> Unit = { puppyId ->
+        navController.navigate("${NavDest.SCREEN_DETAILS}/$puppyId")
+    }
+    val upPress: () -> Unit = {
+        navController.navigateUp()
+    }
+}
+
+object NavDest {
+    const val SCREEN_LIST = "list"
+    const val SCREEN_DETAILS = "details"
+}
+
+private const val ARG_PUPPY_ID = "puppyId"
 
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Composable
